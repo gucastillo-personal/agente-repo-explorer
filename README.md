@@ -2,19 +2,58 @@
 
 Agente de línea de comandos que explora un repositorio local y responde preguntas sobre su código. Construido desde cero con la API de Claude (sin frameworks) para entender el loop de un agente: el modelo decide qué herramienta usar, el código la ejecuta y el resultado vuelve al modelo hasta que responde.
 
+## Ejecutar y observar el flujo en VS Code
+
+1. Abre [main.py](main.py) y marca un punto de parada en `run_agent()` o en la llamada a `client.messages.create()`.
+2. En el menú **Run and Debug**, selecciona **Depurar agente-repo-explorer** y pulsa el botón de ejecución.
+3. En la terminal integrada, escribe la siguiente pregunta:
+
+```text
+Pregunta (enter para salir): ¿qué hace este proyecto?
+```
+
+El programa debe mostrar una respuesta del agente. Si el modelo solicita una herramienta, VS Code debe mostrar el valor de `tool_use`, la ejecución de `run_tool()` y el resultado que se devuelve al modelo.
+
+> La sección de demo siguiente contiene una salida ilustrativa. El comportamiento real depende de la respuesta de Claude, de la clave API y del repositorio que se está explorando.
+
 ## Demo
 
 ```
-Pregunta: ¿Dónde se maneja la autenticación?
+Pregunta: ¿qué hace este proyecto?
 
 -> list_files({'path': '.'})
 -> search_text({'query': 'auth'})
 -> read_file({'path': 'src/auth/login.py'})
 
-Respuesta: La autenticación se maneja en src/auth/login.py, donde ...
 ```
 
-> Reemplazá este ejemplo por una traza real de tu agente.
+```
+Respueta: 
+
+Este proyecto es **Agente Repo Explorer**, un agente de línea de comandos en Python queresponde preguntas sobre el código de un repositorio local. Está construido directamente sobre la API de Claude, sin frameworks. Su propósito es didáctico: mostrar cómo funciona el loop de un agente.
+
+**Cómo funciona**
+- Se ejecuta con `python main.py /ruta/al/repo`. Abre un prompt interactivo, y una línea vacía lo cierra.
+- Para cada pregunta, `run_agent()` envía la conversación a Claude junto con tres herramientas:
+  - `list_files` lista un directorio.
+  - `read_file` lee un archivo, truncado a 20.000 caracteres.
+  - `search_text` busca texto literal, con un máximo de 50 resultados.
+- Mientras la respuesta tenga `stop_reason == "tool_use"`, el código ejecuta las herramientas y devuelve los resultados al modelo. Cuando el modelo responde con texto, esa es la respuesta final.
+
+**Seguridad y límites**
+- `safe_path` impide acceder a rutas fuera del repo explorado.
+- Los errores de las herramientas se devuelven al modelo con `is_error`.
+- `MAX_ITERATIONS = 10` evita loops infinitos.
+- `search_text` ignora `.git`, `.venv`, `node_modules` y `__pycache__`.
+- El agente solo lee, no modifica archivos.
+
+**Discrepancias entre el README y el código**
+- El README muestra en la demo líneas `-> list_files(...)`, pero `main.py` no imprime las llamadas a herramientas.
+- `.env.example` define `ANTHROPIC_API_KEY`, pero el código no carga archivos `.env`. La variable tiene que estar exportada en el entorno.
+- `MODEL = "claude-sonnet-5-5"` conviene revisarlo, porque podría no ser un identificador de modelo válido.
+
+Archivos consultados: `README.md`, `main.py`, `.env.example`.
+```
 
 ## Cómo funciona
 
