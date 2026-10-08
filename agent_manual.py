@@ -2,6 +2,8 @@ import os
 import sys
 import anthropic
 
+from agent_system import SYSTEM
+
 client = anthropic.Anthropic()  # lee ANTHROPIC_API_KEY del entorno
 MODEL = "claude-sonnet-5-5"
 MAX_ITERATIONS = 10
@@ -9,13 +11,6 @@ MAX_FILE_CHARS = 20_000
 MAX_SEARCH_RESULTS = 50
 SKIP_DIRS = {".git", ".venv", "node_modules", "__pycache__"}
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
-
-SYSTEM = (
-    "Eres un asistente que explora un repositorio de código para responder "
-    "preguntas. Empieza listando archivos, usa search_text para ubicar código "
-    "y read_file para leer solo lo necesario. Responde de forma concisa y "
-    "menciona los archivos que consultaste."
-)
 
 PATH_SCHEMA = {"type": "object",
                "properties": {"path": {"type": "string"}},
