@@ -101,6 +101,11 @@ python main.py /ruta/al/repo/a/explorar
 
 El programa abre un menú interactivo. Introduce una pregunta y escribe Enter para salir.
 
+## Documentación
+
+- [Agente manual y LangGraph](docs/agente-manual-vs-langgraph.md): explica cómo se implementó el mismo agente con ambos enfoques y muestra el diagrama Mermaid del grafo.
+- [Generador del diagrama Mermaid](draw_graph_marmaid.py): imprime el grafo actual con `graph.get_graph().draw_mermaid()`.
+
 ## Limitaciones conocidas
 
 - `search_text` busca texto literal, no entiende sinónimos ni semántica.
